@@ -1,0 +1,30 @@
+{
+  "entities": {
+    "NotificationEvent": {
+      "title": "NotificationEvent",
+      "description": "Zdarzenie powiadomienia push.",
+      "type": "object",
+      "properties": {
+        "message": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "senderId": { "type": "string" },
+        "senderEmail": { "type": "string" }
+      },
+      "required": ["message", "timestamp", "senderId", "senderEmail"]
+    }
+  },
+  "firestore": {
+    "/notifications": {
+      "schema": "NotificationEvent",
+      "description": "Kolekcja przechowująca zdarzenia powiadomień do rozesłania."
+    },
+    "/logs": {
+      "schema": "NotificationEvent",
+      "description": "Kolekcja logująca odebrane powiadomienia."
+    },
+    "/tokens": {
+      "schema": "object",
+      "description": "Kolekcja przechowująca tokeny FCM urządzeń."
+    }
+  }
+}

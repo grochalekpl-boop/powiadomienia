@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Domyślna odmowa dostępu
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Funkcje pomocnicze
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll(['message', 'timestamp', 'senderId', 'senderEmail']) 
+             && data.keys().size() == 4
+             && data.message is string && data.message.size() <= 1000
+             && data.senderId == request.auth.uid
+             && data.senderEmail == request.auth.token.email
+             && data.timestamp == request.time;
+    }
+
+    // Kolekcja powiadomień (sygnalizacja)
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidNotification(request.resource.data);
+      allow delete: if isSignedIn(); // Sprzątanie po odczycie lub wygaśnięciu
+    }
+
+    // Kolekcja logów
+    match /logs/{logId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidNotification(request.resource.data);
+    }
+
+    // Kolekcja tokenów FCM
+    match /tokens/{tokenId} {
+      allow read, write: if isSignedIn() && tokenId == request.auth.uid;
+    }
+  }
+}

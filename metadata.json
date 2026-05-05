@@ -1,0 +1,6 @@
+{
+  "name": "Powiadomienia Push",
+  "description": "Aplikacja do wysyłania i odbierania powiadomień push w czasie rzeczywistym między urządzeniami.",
+  "requestFramePermissions": ["notifications"],
+  "majorCapabilities": []
+}
